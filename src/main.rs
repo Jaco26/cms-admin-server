@@ -20,7 +20,7 @@ async fn main() -> io::Result<()> {
 
     let DATABASE_URL = env::var("DATABASE_URL").expect("DATABASE_URL environment variable not set");
     let PORT = env::var("PORT").unwrap_or(String::from("3000"));
-    let HOST_IP = "0.0.0.0";
+    let IP = "0.0.0.0";
 
     let db = database::Db::new(&DATABASE_URL).expect("Couldn't create instance of `Db`");
 
@@ -29,7 +29,7 @@ async fn main() -> io::Result<()> {
             .data(db.clone())
             .service(api::heartbeat)
     })
-    .bind(format!("{}:{}", HOST_IP, PORT))?
+    .bind(format!("{}:{}", IP, PORT))?
     .run()
     .await
 }
