@@ -15,6 +15,9 @@ log = "0.4.11"
 
 argonautica = "0.2.0"
 jsonwebtoken = "7.2.0"
+chrono = "0.4.15"
+
+uuid = { version = "0.8.1", features = ["serde", "v4"] }
 
 futures = "0.3.1"
 actix-multipart = "0.2.0"

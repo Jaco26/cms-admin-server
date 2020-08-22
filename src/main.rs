@@ -12,6 +12,7 @@ use dotenv::dotenv;
 
 mod database;
 mod api;
+mod jwt;
 
 #[actix_rt::main]
 async fn main() -> io::Result<()> {
