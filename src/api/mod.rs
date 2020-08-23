@@ -4,6 +4,7 @@ use serde::Serialize;
 use crate::database::Db;
 
 pub mod model;
+pub mod routes;
 pub mod content;
 
 use model::api_response::ApiResponse;

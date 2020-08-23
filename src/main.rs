@@ -29,6 +29,8 @@ async fn main() -> io::Result<()> {
         App::new()
             .data(db.clone())
             .service(api::heartbeat)
+            .service(api::routes::auth::create_jwt)
+            .service(api::routes::auth::decode_jwt)
     })
     .bind(format!("{}:{}", IP, PORT))?
     .run()

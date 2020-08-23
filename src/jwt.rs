@@ -1,12 +1,13 @@
 use uuid::Uuid;
 use chrono::prelude::*;
 use chrono::{Duration};
-use jsonwebtoken::{self, DecodingKey, EncodingKey, Header, Validation};
+use jsonwebtoken::errors::Error;
+use jsonwebtoken::{self, DecodingKey, EncodingKey, Header, Validation, TokenData};
 use serde::{Deserialize, Serialize};
 
-const SECRET: &str = "sooper-secret";
+const SECRET: &[u8] = b"sooper-secret";
 
-#[derive(Debug, PartialEq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct Claims {
   #[serde(with = "jwt_numeric_date")]
   iat: DateTime<Utc>, // issued at
@@ -19,32 +20,39 @@ pub struct Claims {
   permission: Vec<String> // Permissions associated with role
 }
 
+impl Claims {
+  pub fn new(
+    user_id: &str,
+    user_name: &str,
+    user_role: &str,
+    user_permission: &Vec<String>,
+    exp_seconds: i64,
+  ) -> Claims {
+    let iat = Utc::now();
+    let exp = iat + Duration::seconds(exp_seconds);
+    Claims {
+      iat,
+      exp,
+      jti: Uuid::new_v4().to_string(),
+      sub: user_id.to_string(),
+      name: user_name.to_string(),
+      role: user_role.to_string(),
+      permission: user_permission.clone(),
+    }
+  }
+}
 
-pub fn create_token(
-  exp_seconds: i64,
-  identity: &str,
-  user_name: &str,
-  user_role: &str,
-  user_permission: &Vec<String>
-) -> Result<String, Box<dyn std::error::Error>> {
-  let iat = Utc::now();
-  let exp = iat + Duration::seconds(exp_seconds);
-  let claims = Claims {
-    iat,
-    exp,
-    jti: Uuid::new_v4().to_string(),
-    sub: identity.to_string(),
-    name: user_name.to_string(),
-    role: user_role.to_string(),
-    permission: user_permission.clone(),
-  };
-  let token = jsonwebtoken::encode(
-    &Header::default(),
-    &claims,
-    &EncodingKey::from_secret(SECRET.as_ref())
-  )?;
+pub fn encode(claims: &Claims) -> Result<String, Error> {
+  let token = jsonwebtoken::encode(&Header::default(), claims, &EncodingKey::from_secret(SECRET))?;
   Ok(token)
 }
+
+pub fn decode(token: &str) -> Result<TokenData<Claims>, Error> {
+  let data = jsonwebtoken::decode(token, &DecodingKey::from_secret(SECRET), &Validation::default())?;
+  Ok(data)
+}
+
+
 
 
 mod jwt_numeric_date {
