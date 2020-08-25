@@ -43,16 +43,22 @@ impl Claims {
 }
 
 pub fn encode(claims: &Claims) -> Result<String, Error> {
-  let token = jsonwebtoken::encode(&Header::default(), claims, &EncodingKey::from_secret(SECRET))?;
+  let token = jsonwebtoken::encode(
+    &Header::default(),
+    claims,
+    &EncodingKey::from_secret(SECRET)
+  )?;
   Ok(token)
 }
 
 pub fn decode(token: &str) -> Result<TokenData<Claims>, Error> {
-  let data = jsonwebtoken::decode(token, &DecodingKey::from_secret(SECRET), &Validation::default())?;
+  let data = jsonwebtoken::decode(
+    token,
+    &DecodingKey::from_secret(SECRET),
+    &Validation::default()
+  )?;
   Ok(data)
 }
-
-
 
 
 mod jwt_numeric_date {

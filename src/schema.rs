@@ -6,6 +6,12 @@ table! {
 }
 
 table! {
+    revoked_jwt (jti) {
+        jti -> Varchar,
+    }
+}
+
+table! {
     roles (id) {
         id -> Varchar,
         name -> Nullable<Varchar>,
@@ -43,6 +49,7 @@ joinable!(users_roles -> users (user_id));
 
 allow_tables_to_appear_in_same_query!(
     permissions,
+    revoked_jwt,
     roles,
     roles_permissions,
     users,
