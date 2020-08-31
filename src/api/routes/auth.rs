@@ -1,7 +1,18 @@
-use actix_web::{get, web, HttpResponse, Result};
+use actix_web::{get, post, web, HttpResponse, HttpRequest, Result};
 
 use crate::jwt::{encode, decode, Claims};
 
+struct AuthCredentials {
+  usename: String,
+  password: String,
+}
+
+
+#[post("/login")]
+pub async fn login(body: web::Data<AuthCredentials>) -> Result<HttpResponse> {
+
+  Ok(HttpResponse::Ok().finish())
+}
 
 #[get("/api/create-jwt")]
 pub async fn create_jwt() -> Result<HttpResponse> {
@@ -10,7 +21,7 @@ pub async fn create_jwt() -> Result<HttpResponse> {
     "Jacob",
     "admin",
     &vec!["read".to_string(), "write".to_string(), "delete".to_string()],
-    60 * 15
+    15
   );
   let token = encode(&claims).unwrap();
   Ok(HttpResponse::Ok().body(token))
@@ -20,6 +31,14 @@ pub async fn create_jwt() -> Result<HttpResponse> {
 #[get("/api/decode-jwt/{token}")]
 pub async fn decode_jwt(params: web::Path<(String,)>) -> Result<HttpResponse> {
   let (token,) = params.into_inner();
-  let data = decode(&token).unwrap();
-  Ok(HttpResponse::Ok().json(data.claims))
+  match decode(&token) {
+    Ok(data) => Ok(HttpResponse::Ok().json(data.claims)),
+    Err(error) => {
+      println!("{:?}", error);
+      Ok(HttpResponse::BadRequest().json(json!({
+        "error": "Uh ohhh, bad boy!"
+      })))
+    }
+  }
+  
 }

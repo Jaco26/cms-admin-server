@@ -4,6 +4,7 @@ use chrono::{Duration};
 use jsonwebtoken::errors::Error;
 use jsonwebtoken::{self, DecodingKey, EncodingKey, Header, Validation, TokenData};
 use serde::{Deserialize, Serialize};
+use actix_web::{HttpRequest, ResponseError};
 
 const SECRET: &[u8] = b"sooper-secret";
 
@@ -58,6 +59,12 @@ pub fn decode(token: &str) -> Result<TokenData<Claims>, Error> {
     &Validation::default()
   )?;
   Ok(data)
+}
+
+pub fn validate(req: &HttpRequest) -> Result<Claims, ResponseError> {
+  // extract jwt from req headers
+  // if valid, return Claims
+  // otherwise return ResponseError
 }
 
 
